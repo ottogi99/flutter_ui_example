@@ -1,5 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ui_example/my_form_validation.dart';
+import 'package:ui_example/my_swipe_to_dismiss.dart';
 
 final dummyItems = [
   'https://cdn.pixabay.com/photo/2018/11/12/18/44/thanksgiving-3811492_1280.jpg',
@@ -39,8 +43,12 @@ class _MyHomePageState extends State<MyHomePage> {
   var _index = 0; // 페이지 인덱스 0, 1, 2
   var _pages = [
     Page1(),
-    Page2(),
-    Page3(),
+    MyAnimatedContainer(),
+    MyAnimatedOpacity(),
+    MyDrawer(),
+    MySnackBar(),
+    MyOrientation(),
+    MyTabController(),
   ];
 
   @override
@@ -66,6 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: _pages[_index],
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         onTap: (index) {
           setState(() {
             _index = index;
@@ -79,11 +88,27 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment),
-            label: '이용서비스',
+            label: 'AnimateContainer',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
-            label: '내 정보',
+            label: 'AnimatedOpacity',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.play_arrow),
+            label: 'Drawer',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.start),
+            label: 'SnackBar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.stop),
+            label: 'OrientationBuilder',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.update),
+            label: 'TabController',
           ),
         ],
       ),
@@ -248,36 +273,270 @@ class Page1 extends StatelessWidget {
     });
 
     return ListView(
-      physics: NeverScrollableScrollPhysics(),  // 이 리스트의 스크롤 동작 금지
-      shrinkWrap: true,   // 이 리스트가 다른 스크롤 객체 안에 있다면 true로 설정해야 함
+      physics: NeverScrollableScrollPhysics(), // 이 리스트의 스크롤 동작 금지
+      shrinkWrap: true, // 이 리스트가 다른 스크롤 객체 안에 있다면 true로 설정해야 함
       children: items,
     );
   }
 }
 
-class Page2 extends StatelessWidget {
-  const Page2({Key? key}) : super(key: key);
+class MyAnimatedContainer extends StatefulWidget {
+  const MyAnimatedContainer({Key? key}) : super(key: key);
+
+  @override
+  State<MyAnimatedContainer> createState() => _MyAnimatedContainerState();
+}
+
+class _MyAnimatedContainerState extends State<MyAnimatedContainer> {
+  double _width = 50;
+  double _height = 50;
+  Color _color = Colors.green;
+  BorderRadius _borderRadius = BorderRadius.circular(8);
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        '이용서비스',
-        style: TextStyle(fontSize: 40),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('AnimatedContainer'),
+      ),
+      body: Center(
+        child: AnimatedContainer(
+          width: _width,
+          height: _height,
+          decoration: BoxDecoration(
+            color: _color,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          duration: Duration(seconds: 1),
+          curve: Curves.fastLinearToSlowEaseIn,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            final random = Random();
+            _width = random.nextInt(300).toDouble();
+            _height = random.nextInt(300).toDouble();
+            _color = Color.fromRGBO(random.nextInt(256), random.nextInt(256),
+                random.nextInt(256), 1);
+            _borderRadius =
+                BorderRadius.circular(random.nextInt(100).toDouble());
+          });
+        },
+        child: Icon(Icons.play_arrow),
       ),
     );
   }
 }
 
-class Page3 extends StatelessWidget {
-  const Page3({Key? key}) : super(key: key);
+class MyAnimatedOpacity extends StatefulWidget {
+  const MyAnimatedOpacity({Key? key}) : super(key: key);
+
+  @override
+  State<MyAnimatedOpacity> createState() => _MyAnimatedOpacityState();
+}
+
+class _MyAnimatedOpacityState extends State<MyAnimatedOpacity> {
+  bool _visible = true;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        '내 정보',
-        style: TextStyle(fontSize: 40),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('AnimatedOpacity'),
+      ),
+      body: Center(
+        child: AnimatedOpacity(
+          opacity: _visible ? 1.0 : 0.0,
+          duration: Duration(seconds: 1),
+          child: Container(
+            width: 200,
+            height: 200,
+            color: Colors.green,
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _visible = !_visible;
+          });
+        },
+        child: Icon(Icons.play_arrow),
+      ),
+    );
+  }
+}
+
+class MyDrawer extends StatefulWidget {
+  const MyDrawer({Key? key}) : super(key: key);
+
+  @override
+  State<MyDrawer> createState() => _MyDrawerState();
+}
+
+class _MyDrawerState extends State<MyDrawer> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              child: Text('Header'),
+              decoration: BoxDecoration(color: Colors.blue),
+            ),
+            ListTile(
+              onTap: () {
+                // 할 일
+                Navigator.pop(context);
+              },
+              title: Text('Item 1'),
+            ),
+            ListTile(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              title: Text('Item 2'),
+            ),
+            ListTile(
+              onTap: () {
+                // 할 일
+                Navigator.pop(context);
+              },
+              title: Text('Item 3'),
+            ),
+          ],
+        ),
+      ),
+      appBar: AppBar(
+        title: Text('Drawer'),
+      ),
+      body: Center(
+        child: Text('Drawer 예제'),
+      ),
+    );
+  }
+}
+
+class MySnackBar extends StatefulWidget {
+  const MySnackBar({Key? key}) : super(key: key);
+
+  @override
+  State<MySnackBar> createState() => _MySnackBarState();
+}
+
+class _MySnackBarState extends State<MySnackBar> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('MySnackBar'),
+      ),
+      // body: Center(
+      //   child: ElevatedButton(
+      //     onPressed: () {
+      //       final snackBar = SnackBar(
+      //         content: Text('나는 스낵바'),
+      //       );
+      //       ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      //     },
+      //     child: Text('Show SnackBar'),
+      //   ),
+      // ),
+      body: Builder(
+        builder: (context) => Center(
+          // 여기 context는 별도의 context를 만드는 것?????
+          child: ElevatedButton(
+            onPressed: () {
+              final snackBar = SnackBar(
+                content: Text('메일이 삭제 되었습니다.'),
+                action: SnackBarAction(
+                  onPressed: () {
+                    // 눌렀을 때 처리
+                  },
+                  label: '취소',
+                ),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            },
+            child: Text('Show SnackBar'),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MyOrientation extends StatefulWidget {
+  const MyOrientation({Key? key}) : super(key: key);
+
+  @override
+  State<MyOrientation> createState() => _MyOrientationState();
+}
+
+class _MyOrientationState extends State<MyOrientation> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('OrientationBuilder'),
+      ),
+      body: OrientationBuilder(
+        builder: (BuildContext context, Orientation orientation) {
+          return GridView.count(
+            crossAxisCount: orientation == Orientation.portrait ? 3 : 5,
+            children: List.generate(
+              50,
+              (position) {
+                return Center(
+                  child: Text('Item $position'),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class MyTabController extends StatefulWidget {
+  const MyTabController({Key? key}) : super(key: key);
+
+  @override
+  State<MyTabController> createState() => _MyTabControllerState();
+}
+
+class _MyTabControllerState extends State<MyTabController> {
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+            title: Text('TabController'),
+            bottom: TabBar(
+              tabs: [
+                Tab(icon: Icon(Icons.access_alarm)),
+                Tab(
+                  icon: Icon(Icons.portrait),
+                  text: 'SwipeToDismissible',
+                ),
+                Tab(
+                  text: 'FormValidation',
+                  icon: Icon(Icons.access_time),
+                ),
+              ],
+            )),
+        body: TabBarView(
+          children: [
+            Icon(Icons.access_alarm),
+            MySwipeToDismiss(),
+            MyFormValidation(),
+          ],
+        ),
       ),
     );
   }
